@@ -9,7 +9,7 @@
 # 活动流程 #
 
 * 主题演讲
-  * Joseph Pan: 开源禅史——ARPANET宗,UNIX宗到 RMS 的精神革命（课件：sfd.pdf）
+  * Joseph Pan: 开源禅史——ARPANET宗,UNIX宗到 RMS 的精神革命（课件：开源禅史.pdf）
   * karazu kuro:我们仍未知道那天所玩发行版的内涵——linux各发行版的区别（课件：小谈Linux发行版.pdf）
   * 中场休息 & 抽奖
   * Qian Hong:做一名开源社区的扫地僧 (上)
