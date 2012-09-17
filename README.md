@@ -1,4 +1,4 @@
 slides
 ==========
 
-存放每次活動的Slides
+存放每次活动的slides
