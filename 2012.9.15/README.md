@@ -14,7 +14,7 @@
   * 中场休息 & 抽奖
   * Qian Hong:做一名开源社区的扫地僧 (上)
 * 游戏环节
-  * hiphen lee:看图识字玩游戏（课件：game/index.html）
+  * hiphen lee:看图识字玩游戏
 * 活动结束合照
 * 自由交流环节
 * 聚餐
