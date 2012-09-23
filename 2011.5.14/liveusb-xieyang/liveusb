@@ -1,0 +1,98 @@
+=========================
+LiveUSB 原理&制作
+=========================
+    
+    :Authors: XieYang
+    :Date: 2011-05-14
+
+提纲
+====
+
+    #. LiveUSB
+    #. 背景知识
+        #. U盘
+        #. MBR
+        #. bootloader
+        #. computer boot step
+    #. 制作LiveUSB
+    #. 参考资料
+
+
+LiveUSB
+===================
+    :Defined:
+        #. live USB is a USB flash drive containing a operating system which can be booted.
+        #. Live USBs are closely related to live CDs, but ability to save settings permanently 
+        #. For system administration, data recovery without a permanent installation on the local hard disk drive.
+
+U盘
+====
+
+    :Defined: Universal Serial Bus
+    :组成:
+        #. Male type-A USB connector – interface
+        #. USB mass storage controller – store configureation
+        #. NAND flash memory chip – store data
+        #. Crystal oscillator – produces the device's main 12 MHz clock signal and controls the device's data output through a phase-locked loop.
+
+
+Master Boot Record
+====================
+
+    :Function: find the actual boot code on the drive, replace itself with it, and run it.
+
+    :MBR Structure:
+        +---+-------------------------------------+-----+
+        |Dec|Description                          | Size|
+        +---+-------------------------------------+-----+
+        |0  |code area                            | 440 |
+        +---+-------------------------------------+-----+
+        |440|disk signature (optional)            | 4   |
+        +---+-------------------------------------+-----+
+        |444|Usually nulls;0x0000                 | 2   |
+        +---+-------------------------------------+-----+
+        |446|partitions table Four 16-byte entries| 64  |
+        +---+-------------------------------------+-----+
+        |510|MBR signature;55AA                   | 2   |
+        +---+-------------------------------------+-----+
+
+
+bootloader
+===================
+
+    :Function: load the operating system properly
+
+    :Example:
+        #. GRUB
+        #. BOOTMGR
+        #. Syslinux
+        #. LILO
+        #. NTLDR
+
+
+computer boot step
+===================
+
+    :Step:
+        #. POST (Power On Self Test)
+        #. Load MBR in to 0000:7C00 or 07C0:0000
+        #. find bootloader and executes it
+        #. load kernel
+
+制作LiveUSB
+===================
+
+    :Step:
+        #. install MBR into USB Driver
+        #. configure bootloader
+        #. copy system files
+
+
+参考资料
+============
+
+    http://en.wikipedia.org/wiki/USB_flash_drive
+    http://en.wikipedia.org/wiki/Master_boot_record
+    http://mbr.adamsatoms.com/
+    http://en.wikipedia.org/wiki/Booting
+    http://www.linuxselfhelp.com/gnu/grub/html_chapter/grub_4.html
