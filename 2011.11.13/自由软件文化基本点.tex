@@ -1,0 +1,146 @@
+\documentclass[handout,CJK,xetex]{beamer}
+\usepackage{xltxtra,fontspec,xunicode}
+\usepackage[slantfont,boldfont]{xeCJK}
+%\usepackage[usenames,dvipsnames]{color}
+%\usepackage{verbatim}
+%\setCJKmainfont{AR PL UMing CN}
+\setCJKmainfont{WenQuanYi Zen Hei}
+%\setCJKmainfont{WenQuanYi Micro Hei}
+%\setCJKmainfont{AR PL KaitiM GB}
+\punctstyle{quanjiao}
+%\setmonofont{DejaVu Sans Mono}
+%\setmainfont{WenQuanYi Zen Hei}
+\usepackage{hyperref}
+%\usepackage{tikz}
+%\usetikzlibrary{arrows,backgrounds,shapes.arrows,decorations.pathmorphing,fit,chains,positioning}
+
+\mode<presentation>
+{
+   \usetheme{Warsaw}
+  %\usetheme{PaloAlto}
+  % or ...
+
+  \setbeamercovered{transparent}
+  % or whatever (possibly just delete it)
+}
+
+%\usepackage{beamerthemesplit}
+%\includeonlyframes{this}
+%\newcommand{\tikzemph}[1]{\normalsize\textcolor{green!50!black}{#1}}
+%\newcommand{\mynode}[2]{node[inner sep=1pt,anchor=north,rectangle split,rectangle split parts=2] {#1 \nodepart{second} #2}}
+%\newcommand{\myannode}[2]{node[text width=30pt,inner sep=1pt,anchor=north,rectangle split,rectangle split parts=2] {#1 \nodepart{second} #2}}
+%\newcommand{\mynwnode}[2]{node[inner sep=1pt,anchor=north west,rectangle split,rectangle split parts=2] {#1 \nodepart{second} #2}}
+%\newcommand{\mynenode}[2]{node[inner sep=1pt,anchor=north east,rectangle
+%  split,rectangle split parts=2] {#1 \nodepart{second} #2}}
+\newcommand{\mydir}[1]{{\color{red} \texttt{#1}}}
+\newcommand{\mycmd}[1]{{\color{blue} \texttt{#1}}}
+\newcommand{\myfile}[1]{{\color{purple} \texttt{#1}}}
+\title{自由软件文化基本点}
+\author[李瑞彬]{李瑞彬(cheeselee@fedoraproject.org)}
+\date{2011年11月13日}
+
+
+%\AtBeginSubsection[]
+%{
+  %\begin{frame}<beamer>{Outline}
+    %\tableofcontents[sectionstyle=show/hide,subsectionstyle=show/shaded/hide] %currentsection,currentsubsection,hideallsubsections]
+  %\end{frame}
+%}
+\AtBeginSection[]
+{
+  \begin{frame}<beamer>{四个基本点}
+    \tableofcontents[currentsection,hideothersubsections]
+  \end{frame}
+}
+%\newtheorem{mydef}{定义}
+%\newtheorem{definition}{
+
+\begin{document}
+
+%\frame[plain]{\titlepage}
+\frame{\titlepage}
+
+\begin{frame}{Fedora Packaging Guidelines}
+  \begin{itemize}
+  \item \url{fedoraproject.org/wiki/Packaging/Guidelines}
+  \item 规定怎样的软件可以进入Fedora主库
+  \item 后面简称为Guideline
+  \end{itemize}
+\end{frame}
+
+
+\begin{frame}{四个基本点}
+  \tableofcontents[hideallsubsections]
+  % You might wish to add the option [pausesections]
+\end{frame}
+%\section*{}
+
+
+\section{遵从标准}
+\begin{frame}{必须的标准}
+\begin{itemize}[<+->]
+  \item 比如：Filesystem Hierarchy Standard (FHS)
+  \item \url{http://www.pathname.com/fhs/}
+    \begin{block}{Guideline}
+      Fedora packages must follow the FHS.
+    \end{block}
+  \item 这不是重点。
+\end{itemize}
+\end{frame}
+
+\begin{frame}{建议的标准}
+\begin{itemize}[<+->]
+  \item 比如：MPRIS
+  \item \url{http://www.freedesktop.org/wiki/Specifications/mpris-interfacing-specification}
+  \item 媒体播放器的通用D-Bus接口
+  \item Amarok, Exaile, VLC, $\cdots$
+  \item 自由软件社区更容易达成和支持这类标准
+\end{itemize}
+\end{frame}
+
+\section{便于编译时定制与测试}
+\begin{frame}{自动构建系统}
+  \begin{itemize}[<+->]
+  \item 自由软件应该方便让使用者设置编译选项，特别是编译器的优化级
+  \item 自由软件应该采用某种自由的自动构建系统(build automation software)。
+  \item \url{en.wikipedia.org/wiki/List_of_build_automation_software}
+  \item Autoconf/Automake, CMake, Maven, $\cdots$
+  \item 反面教材：~\href{http://www.xmind.net/}{XMind}
+  \item 自由软件应该提供配套测试，并且可以简单运行(make test)
+    \begin{block}{Guideline}
+      If the source code of the package provides a test suite, it should be executed $\cdots$
+    \end{block}
+  \end{itemize}
+\end{frame}
+
+\section{不要重复发明轮子}
+\begin{frame}{Don't reinvent the wheel!}
+  \begin{itemize}[<+->]
+  \item 自由软件应尽量依赖现成的自由软件
+  \item 依赖越多，开发者视野越广，软件质量越高
+  \item 依赖越多，打包者越兴奋
+  \item 开发者应及时更新依赖
+  \item 让你的发明被依赖！
+  \item 自由软件应提供足够的文档，让别人也同样容易地整合你的成果
+    \begin{block}{Guideline}
+Any relevant documentation included in the source distribution should be included in the package $\ldots$
+    \end{block}
+  \end{itemize}
+\end{frame}
+
+\section{便于参与}
+\begin{frame}{版本控制(version control)和缺陷跟踪(bug tracking)}
+  \begin{itemize}[<+->]
+  \item 两者为最基本的社区沟通工具
+  \item 使用Google Code, Github, $\cdots$
+  \item 版本控制系统展现出项目开发状态，便于生成补丁
+  \item 缺陷跟踪系统便于用户和下游反馈问题，便于制定开发计划
+    \begin{block}{Guideline}
+All patches should have an upstream bug link or comment
+\end{block}
+\end{itemize}
+\end{frame}
+
+%\section*{}
+
+\end{document}

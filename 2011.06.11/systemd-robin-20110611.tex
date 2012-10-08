@@ -1,0 +1,340 @@
+\documentclass[CJK,xetex]{beamer}
+\usepackage{xltxtra,fontspec,xunicode}
+\usepackage[slantfont,boldfont]{xeCJK}
+%\usepackage[usenames,dvipsnames]{color}
+%\usepackage{verbatim}
+%\setCJKmainfont{AR PL UMing CN}
+\setCJKmainfont{WenQuanYi Zen Hei}
+%\setCJKmainfont{WenQuanYi Micro Hei}
+%\setCJKmainfont{AR PL KaitiM GB}
+\punctstyle{kaiming}
+%\setmonofont{DejaVu Sans Mono}
+%\setmainfont{WenQuanYi Zen Hei}
+
+\usepackage{tikz}
+\usetikzlibrary{arrows,backgrounds,shapes.arrows,decorations.pathmorphing,fit,chains,positioning}
+
+\mode<presentation>
+{
+  % \usetheme{Warsaw}
+  \usetheme{PaloAlto}
+  % or ...
+
+  \setbeamercovered{transparent}
+  % or whatever (possibly just delete it)
+}
+
+%\usepackage{beamerthemesplit}
+%\includeonlyframes{this}
+\newcommand{\tikzemph}[1]{\normalsize\textcolor{green!50!black}{#1}}
+\newcommand{\mynode}[2]{node[inner sep=1pt,anchor=north,rectangle split,rectangle split parts=2] {#1 \nodepart{second} #2}}
+\newcommand{\myannode}[2]{node[text width=30pt,inner sep=1pt,anchor=north,rectangle split,rectangle split parts=2] {#1 \nodepart{second} #2}}
+\newcommand{\mynwnode}[2]{node[inner sep=1pt,anchor=north west,rectangle split,rectangle split parts=2] {#1 \nodepart{second} #2}}
+\newcommand{\mynenode}[2]{node[inner sep=1pt,anchor=north east,rectangle
+  split,rectangle split parts=2] {#1 \nodepart{second} #2}}
+\newcommand{\mydir}[1]{{\color{red} \texttt{#1}}}
+\newcommand{\myfile}[1]{{\color{purple} \texttt{#1}}}
+\title{systemd简介}
+\author[李瑞彬]{李瑞彬\\Robin `cheese' Lee\\
+(cheeselee@fedoraproject.org)}
+\date{2011年6月11日}
+
+
+%\AtBeginSubsection[]
+%{
+  %\begin{frame}<beamer>{Outline}
+    %\tableofcontents[sectionstyle=show/hide,subsectionstyle=show/shaded/hide] %currentsection,currentsubsection,hideallsubsections]
+  %\end{frame}
+%}
+%\AtBeginSection[]
+%{
+  %\begin{frame}<beamer>{Outline}
+    %\tableofcontents[currentsection,hideothersubsections]
+  %\end{frame}
+%}
+%\newtheorem{mydef}{定义}
+%\newtheorem{definition}{
+
+\begin{document}
+
+%\frame[plain]{\titlepage}
+\frame{\titlepage}
+
+%\begin{frame}[plain]{Outline}
+%  \tableofcontents[hideallsubsections]
+  % You might wish to add the option [pausesections]
+%\end{frame}
+
+\section{缘起}
+\subsection{init 守护进程}
+\begin{frame}{init 守护进程}
+\begin{itemize}[<+->]
+  \item 系统的第一个进程，由内核启动，进程号(PID)为1
+% 对于所有基于Unix的系统，有那么一个程序，它由最先被启动
+  \item \myfile{/sbin/init}
+  \item init => initialization
+  \item 进程树的根
+  \item 开机，也就是初始化用户环境(bring up \emph{userspace})
+  \item 关机，重启，管理系统服务……
+% 它是所有（用户空间）进程的父进程
+\end{itemize}
+\end{frame}
+
+\subsection{SysVInit}
+\begin{frame}{System V Init}
+  \begin{itemize}[<+->]
+  \item 初始化脚本 (initscript / rc script)
+  \item rc => run commands
+  \item \mydir{/etc/rc.d/init.d}
+  \item \mydir{/etc/inittab}
+    \begin{itemize}
+    \item \texttt{id:5:initdefault:}
+    \end{itemize}
+  \item \mydir{/etc/rc.d/rc5.d}
+    \begin{itemize}
+  \item 举例:\\
+    \myfile{/etc/rc.d/rc5.d/K36mysqld}
+    \begin{tabular}[]{r|c|l}
+      \hline
+      K & 36 & mysqld \\
+      K[ill]/S[tart] & 启动顺序 & 服务名\\
+      \hline
+    \end{tabular}
+  \item 链接至\\
+    \myfile{../init.d/mysqld}\\
+  \end{itemize}
+\item 运行级配置相互独立
+  \end{itemize}
+\end{frame}
+
+\subsection{Upstart}
+\begin{frame}{Upstart}
+\begin{itemize}[<+->]
+\item 事件驱动(event-driven/-based)
+\item 理顺服务依赖关系以便实现并行启动
+\item 按需启动
+\item Upstart job script
+\end{itemize}
+\end{frame}
+
+\subsection{systemd}
+% 照片上侧
+\begin{frame}{systemd}
+  \centerline{\XeTeXpicfile lennart.png width 2.5cm}
+  \centerline{Lennart Poettering}
+  \begin{itemize}[<+->]
+  \item Red Hat 员工
+  \item 但 systemd 不是 Red Hat 项目
+  \item freedesktop.org 项目
+  \item \url{http://www.freedesktop.org/wiki/Software/systemd}
+  \end{itemize}
+\end{frame}
+
+\section{野望}
+\subsection{三个中心思想}
+\begin{frame}{systemd的三个中心思想}
+  \begin{itemize}[<+->]
+  \item 按需启动
+    \begin{itemize}
+    \item 启动时
+    \item Socket
+    \item D-Bus
+    \item 时钟，可替代crond
+    \item \ldots
+    \end{itemize}
+  \item 无竞争的并行启动(race-free parallelized start-up)
+% message queue
+% make those sockets available for connection earlier and only actually wait for that instead of the full daemon start-up
+  \item 设定进程运行环境(context)
+% 办公室上班
+    \begin{itemize}
+    \item CPU/IO 优先级
+    \item 文件目录读写权限
+    \item control group (cgroup)
+% keep track of processes, every process gets its own cgroup (control group)
+    \item 文件句柄(file handles)
+    \end{itemize}
+  \end{itemize}
+\end{frame}
+
+\section{实现}
+% 刚好就是 Upstart 所没有的
+\subsection{systemd units}
+\begin{frame}{systemd units}
+  \begin{itemize}[<+->]
+  \item 一个配置文件即是一个systemd unit
+  \item systemd 系统级配置目录
+    \begin{itemize}
+    \item \mydir{/etc/systemd/system/}
+    \item \mydir{/lib/systemd/system/}
+    \end{itemize}
+  \item 兼容LSB initscript的头部信息
+    \begin{itemize}
+    \item LSB initscript 成了systemd的另一种配置方式
+    \item 以systemd的方式启动服务，并不会直接运行 initscript
+    \end{itemize}
+  \item systemd unit的类型举例\\
+    \begin{tabular}[]{l|l}
+      \hline
+      \texttt{.service} & 系统服务\\
+      \texttt{.target}  & 运行级(runlevel)\\
+      \texttt{.timer}   & 时钟\\
+      \texttt{.socket}  & IPC/Network socket\\ 
+      \hline
+    \end{tabular}
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{systemd units读取示例}
+  \begin{itemize}[<+->]
+  \item 寻找: \myfile{default.target}
+  \item 找到: \myfile{/etc/systemd/system/default.target}
+  \item 链接至: \myfile{/lib/systemd/system/runlevel5.target}
+    \begin{itemize}
+    \item 默认运行级为5
+    \end{itemize}
+  \item 链接至: \myfile{/lib/systemd/system/graphical.target}
+    \begin{itemize}
+    \item 运行级5为图形界面环境
+    \item 终于找到一个普通文件，读取它吧！
+% [打开文件]
+    \item \texttt{Requires=multi-user.target}
+      \begin{itemize}
+      \item 需要多用户环境
+      \end{itemize}
+    \end{itemize}
+  \item 图形界面环境还需要哪些服务: \mydir{graphical.target.wants}
+    \begin{itemize}
+    \item \myfile{/etc/systemd/system/graphical.target.wants/*}
+    \item \myfile{/lib/systemd/system/graphical.target.wants/*}
+    \item \myfile{/lib/systemd/system/display-manager.service}
+      \begin{itemize}
+% [打开文件]
+      \item \texttt{ExecStart=/etc/X11/prefdm -nodaemon}
+      \end{itemize}
+    \end{itemize}
+  \end{itemize}
+\end{frame}
+
+\subsection{Buffered interfaces}
+\begin{frame}{Buffered interfaces}
+  \begin{itemize}[<+->]
+  \item Socket-activatable
+  \begin{itemize}
+  \item 进程间通信，通过一些界面 interface 进行
+  \item 最常见的就是 Unix domain socket
+  \item 一个进程实际上并不依赖另一个进程，而只依赖 socket
+  \item systemd 利用内核缓存机制，先产生需要的 socket
+  \item 系统服务就可以无分先后地启动，而不会丢失信息
+  \end{itemize}
+  \item Bus-activatable
+% upstart 也有
+  \item Path-activatable
+  \item \ldots
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[label=this]{Socket-activatable}
+  \begin{tikzpicture}[start chain,
+    node distance=5mm,
+    terminal/.style={rectangle,minimum size=6mm,very
+      thick,draw=red!50!black!50,top color=white,bottom
+      color=red!50!black!20},
+    nonterminal/.style={circle,minimum size=6mm,very
+      thick,draw=red!50!black!50,top color=white,bottom
+      color=red!50!black!20},
+    every node/.style={}, every join/.style={->}]
+    \uncover<1->{\node (systemd) [terminal] {systemd};}
+    \uncover<2->{\node (socket1) [nonterminal,right=of systemd] {socket};}
+    \uncover<3->{
+    \node (reader1) [terminal,below right=of socket1] {Reader};
+    \node (writer1) [terminal,below=of reader1] {Writer1};
+    \node (writer2) [terminal,below=of writer1] {Writer2};
+  }
+  \uncover<4->{
+    \node (write1)  [nonterminal,right=of writer1] {写};
+    \node (write2)  [nonterminal,right=of write1] {写};
+    \node (write3)  [nonterminal,right=of writer2,xshift=13mm] {写};
+  }
+  \uncover<7->{\node (write4)  [nonterminal,right=of write3,xshift=5mm] {写};}
+    \uncover<5->{
+      \node (finish)  [terminal,right=of reader1,xshift=8mm] {Reader};
+    }
+    \uncover<6->{
+    \node (socket2) [nonterminal,right=of finish] {socket};
+    \node (read) [nonterminal,right=of socket2,xshift=-5mm] {读};
+    }
+
+    \uncover<2->{\path (systemd) edge [->] (socket1);}
+    \uncover<3->{
+    \path (socket1.south) edge [->] (reader1.west);
+    \path (socket1.south) edge [->] (writer1.west);
+    \path (socket1.south) edge [->] (writer2.west);
+  }
+ \uncover<5->{\path (reader1) edge [->] (finish);}
+    \uncover<4->{
+    \path (writer1) edge [->] (write1);
+    \path (write1) edge [->] (write2);
+    \path (writer2) edge [->] (write3);
+    }
+    \uncover<7->{\path (write3) edge [->] (write4);}
+    \uncover<6->{
+    \path (finish) edge [->] (socket2);
+    \path (socket1.east) edge
+    [->,decorate,decoration={snake,amplitude=.4mm,segment length=2mm,post
+      length=1mm}] (socket2.north);
+    \node [gray,above] at (socket2.north) {\footnotesize{传递}};
+    }
+    \uncover<2->{\node [gray,above] at (socket1.north) {\footnotesize{创建}};}
+    \uncover<3->{\node [gray,above] at (reader1.north) {\footnotesize{开始启动}};}
+    \uncover<5->{\node [gray,above] at (finish.north) {\footnotesize{完成启动}};}
+  \end{tikzpicture}
+\end{frame}
+
+\section{革新}
+\subsection{对程序开发的影响}
+\begin{frame}{systemd对程序开发的影响}
+  \begin{itemize}[<+->]
+  \item systemd-style daemon
+    \begin{itemize}
+    \item 实现一个 daemon => 请以 daemon 的方式把程序启动
+    \item 不需要(old-style daemon):
+      \begin{itemize}
+      \item double fork/setsid/chdir/\ldots
+      \item initscript
+      \item \ldots
+      \end{itemize}
+    \item 需要（推荐）:
+      \begin{itemize}
+      \item \texttt{.service} (systemd unit file)
+      \item \texttt{SIGTERM} => 关闭
+      \item \texttt{SIGHUP} => 重启
+      \item \texttt{sd\_notify(3)}
+      \item \ldots
+      \end{itemize}
+    \end{itemize}
+  \item 批量启动和关闭程序
+    \begin{itemize}
+    \item 取代 desktop session (gnome-session/kdeinit)
+    \end{itemize}
+  \end{itemize}
+\end{frame}
+
+\section{结语}
+\begin{frame}{结语}
+  \begin{itemize}
+  \item<1-> Appreciation for launchd from Apple
+    \begin{itemize}
+    \item<1-> 虽然对于 Linux 来说是革命性的，但 idea 其实很多来源于 launchd
+    \item<2-> Mac OS X v10.4 ``Tiger'' 2005年
+    \end{itemize}
+  \item<3-> 参考:
+    \begin{itemize}
+    \item 作者初始story：\url{http://0pointer.de/blog/projects/systemd.html}
+      % blog update update2
+    \item \texttt{systemd.*(5)}
+    \item \texttt{daemon(7)}
+    \end{itemize}
+  \end{itemize}
+\end{frame}
+\end{document}

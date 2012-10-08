@@ -1,0 +1,178 @@
+\documentclass[CJK,xetex]{beamer}
+\usepackage{xltxtra,fontspec,xunicode}
+\usepackage[slantfont,boldfont]{xeCJK}
+%\usepackage[usenames,dvipsnames]{color}
+%\usepackage{verbatim}
+%\setCJKmainfont{AR PL UMing CN}
+\setCJKmainfont{WenQuanYi Zen Hei}
+%\setCJKmainfont{WenQuanYi Micro Hei}
+%\setCJKmainfont{AR PL KaitiM GB}
+\punctstyle{kaiming}
+%\setmonofont{DejaVu Sans Mono}
+%\setmainfont{WenQuanYi Zen Hei}
+
+%\usepackage{tikz}
+%\usetikzlibrary{arrows,backgrounds,shapes.arrows,decorations.pathmorphing,fit,chains,positioning}
+
+\mode<presentation>
+{
+   \usetheme{Warsaw}
+  %\usetheme{PaloAlto}
+  % or ...
+
+  \setbeamercovered{transparent}
+  % or whatever (possibly just delete it)
+}
+
+%\usepackage{beamerthemesplit}
+%\includeonlyframes{this}
+%\newcommand{\tikzemph}[1]{\normalsize\textcolor{green!50!black}{#1}}
+%\newcommand{\mynode}[2]{node[inner sep=1pt,anchor=north,rectangle split,rectangle split parts=2] {#1 \nodepart{second} #2}}
+%\newcommand{\myannode}[2]{node[text width=30pt,inner sep=1pt,anchor=north,rectangle split,rectangle split parts=2] {#1 \nodepart{second} #2}}
+%\newcommand{\mynwnode}[2]{node[inner sep=1pt,anchor=north west,rectangle split,rectangle split parts=2] {#1 \nodepart{second} #2}}
+%\newcommand{\mynenode}[2]{node[inner sep=1pt,anchor=north east,rectangle
+%  split,rectangle split parts=2] {#1 \nodepart{second} #2}}
+\newcommand{\mydir}[1]{{\color{red} \texttt{#1}}}
+\newcommand{\mycmd}[1]{{\color{blue} \texttt{#1}}}
+\newcommand{\myfile}[1]{{\color{purple} \texttt{#1}}}
+\title{Linux目录架构与包管理系统}
+\author[李瑞彬]{李瑞彬(cheeselee@fedoraproject.org)}
+\date{2011年8月5日}
+
+
+%\AtBeginSubsection[]
+%{
+  %\begin{frame}<beamer>{Outline}
+    %\tableofcontents[sectionstyle=show/hide,subsectionstyle=show/shaded/hide] %currentsection,currentsubsection,hideallsubsections]
+  %\end{frame}
+%}
+%\AtBeginSection[]
+%{
+  %\begin{frame}<beamer>{Outline}
+    %\tableofcontents[currentsection,hideothersubsections]
+  %\end{frame}
+%}
+%\newtheorem{mydef}{定义}
+%\newtheorem{definition}{
+
+\begin{document}
+
+%\frame[plain]{\titlepage}
+\frame{\titlepage}
+
+%\begin{frame}[plain]{Outline}
+%  \tableofcontents[hideallsubsections]
+  % You might wish to add the option [pausesections]
+%\end{frame}
+\section{Unix目录结构}
+\begin{frame}{一棵树}
+\begin{itemize}[<+->]
+  \item 根目录 ``\mydir{/}''
+  \item DOS每个磁盘分区一棵树
+  \item 在Unix中，磁盘分区要使用，要先挂载（\texttt{mount}）到目录树上
+  \item 用户不需要理会机器的分区策略
+  \item \texttt{df} 命令
+\end{itemize}
+\end{frame}
+
+\begin{frame}{关键思想：依功能摆放文件}
+  \begin{itemize}[<+->]
+  \item \mydir{bin/}:可执行文件
+  \item \mydir{lib/}:依赖机器架构的库文件
+  \item \mydir{/usr/share/}:不依赖机器架构的文件
+  \item \mydir{/etc/}:系统级配置文件
+  \item \mydir{/var/}:常变动的文件，如程序数据、日志  
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{一些重要的目录}
+\begin{itemize}[<+->]
+  \item \mydir{/bin/}:Unix基础程序
+  \item \mydir{/sbin/}:需root权限运行的可执行文件
+  \item \mydir{/lib/}:基础C库
+  \item \mydir{/etc/} \mydir{/var/}
+  \item \mydir{/dev/}:以文件形式呈现出来的硬件设备
+  \item \mydir{/home/*/} \mydir{/root/} 用户目录
+  \item \mydir{/mnt/} \mydir{/media/} 挂载临时分区
+  \item \mydir{/proc/} 系统运行状态信息
+  \item \mydir{/boot/} 启动管理器配置与Linux内核
+  \item \mydir{/usr/} 非基础级程序，内容与根目录有一些相似，安装发行版打包的程序
+  \item \mydir{/usr/local/} 与\mydir{/usr}雷同，手动编译安装的程序默认目录
+\end{itemize}
+\end{frame}
+
+\begin{frame}{所谓安装删除程序}
+  \begin{itemize}[<+->]
+  \item 安装程序就是将它的可执行文件复制到\mydir{/usr/bin/}，将库文件复制到\mydir{/usr/lib/}，将配置文件复制到\mydir{/etc/}，……
+  \item 那要删除程序怎么办呢？
+    \item 依赖的地狱！
+    \item 包管理系统就应运而生
+    \item 包管理系统包括若干个组成程序
+      \begin{itemize}
+      \item 包管理器(package manager)：如\myfile{rpm}、\myfile{dpkg}
+      \item 依赖处理系统：如\myfile{yum}、\myfile{apt}
+      \item 交互式操作界面：如\myfile{PackageKit}、\myfile{synaptic}、\myfile{aptitude}
+      \end{itemize}
+  \end{itemize}
+\end{frame}
+
+\section{包管理器(package manager)}
+
+\begin{frame}{包管理器(package manager)}
+\begin{itemize}[<+->]
+  \item 包管理器基本功能：
+  \begin{itemize}
+    \item 从软件包提取文件复制到系统目录（安装程序）
+    \item 记录文件属于哪个软件包
+    \item 删除软件包所属的所有文件（删除程序）
+    \item 管理配置文件
+    \item 在程序安装前后运行必要的脚本
+    \end{itemize}
+    \item 包管理系统是Linux发行版之间的最主要差别
+  \item RedHat系（RHEL/CentOS Fedora）：\myfile{rpm}
+    \item Debian系（Debian Ubuntu）：\myfile{dpkg}
+\end{itemize}
+\end{frame}
+
+\begin{frame}{软件包}
+\begin{itemize}[<+->]
+  \item 将要安装的文件以绝对路径打包压缩到一起
+  \item 记录软件信息（包名、版本、依赖关系……）
+  \item 实例：\myfile{nginx-0.8.54-1.fc15.x86$\_$64.rpm} \myfile{nginx$\_$0.7.67-3$\_$i386.deb}
+\end{itemize}
+\end{frame}
+
+\section{依赖处理程序}
+\begin{frame}{依赖处理程序}
+\begin{itemize}[<+->]
+  \item 基本功能：
+\begin{itemize}
+  \item 安装软件（从软件库拉取软件包及它的依赖的软件包，然后让包管理器有序安装它们）
+  \item 删除软件（并自动删除一些无用的依赖包）
+  \item 更新软件（将已安装的软件升级到软件库里的最新版本）
+\end{itemize}
+  \item RedHat系（RHEL/CentOS Fedora）：\myfile{yum}
+    \item Debian系（Debian Ubuntu）：\myfile{apt}
+\end{itemize}
+\end{frame}
+
+\section{Yum}
+\begin{frame}{Yum}
+  \begin{itemize}
+  \item 安装软件（根据包名）：\mycmd{yum install nginx}
+  \item 安装软件（根据程序文件名）：\\ \mycmd{yum install /usr/bin/eclipse}
+  \item 删除软件：\mycmd{yum remove httpd}
+  \item 删除软件及无用的依赖（需要remove-with-leaves插件）：\\ \mycmd{yum remove --remove-leaves httpd}
+  \item 历史回退：\mycmd{yum history undo last}
+  \item 参考\mycmd{yum --help}和\mycmd{man yum}
+  \end{itemize}
+\end{frame}
+
+\section{Aptitude}
+\begin{frame}{Aptitude}
+  \begin{itemize}
+    \item 前言：用\myfile{apt-spy}自动选择最快的源
+    \item aptitude是apt的一个神级的交互操作界面
+  \end{itemize}
+\end{frame}
+\end{document}
